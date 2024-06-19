@@ -1,0 +1,9 @@
+{
+  "recursive": true,
+  "extension": ["ts"],
+  "require": ["./spec/helper.mjs", "dotenv/config"],
+  "spec": ["./spec/**.ts"],
+  "loader": "ts-node/esm/transpile-only",
+  "env": "dotenv_config_path=./.env",
+  "exit": true
+}

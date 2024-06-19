@@ -17,6 +17,7 @@ This project implements a comprehensive system with user and admin functionaliti
 ### User Functionalities
 
 1. **Account Management:**
+
    - [ ] Create an account (Register).
    - [ ] Sign in.
    - [ ] View personal information.
@@ -30,12 +31,14 @@ This project implements a comprehensive system with user and admin functionaliti
 ### Admin Functionalities
 
 1. **User Management:**
+
    - [ ] View information of all users.
    - [ ] Modify user's information.
    - [ ] Delete a user from the site.
    - [ ] Promote a user to administrator (admin).
 
 2. **Role Management:**
+
    - [ ] Create new roles.
    - [ ] Manage roles in a roles table.
 
@@ -53,22 +56,30 @@ This project implements a comprehensive system with user and admin functionaliti
 1. **Clone the repository:**
    ```
    git clone https://github.com/abubkr-hago/full-stack-developer-test
+   ```
 2. **Install dependencies:**
    ```
    cd full-stack-developer-test
    npm install
+   ```
 3. **Set up environment variables:**
 
    Create a .env file in the directory with the following content:
+
    ```
    MONGODB_URI=your_mongodb_uri
    STRIPE_SECRET_KEY=your_stripe_secret_key
-5. **Run tests:**
+   ```
+
+4. **Run tests:**
    ```
    npm test
+   ```
+
 ## Deployment
 
 The project has been deployed to Vercel. You can access it using the following link:
+
 - [ ] [Vercel link](/#)
 
 ## License
