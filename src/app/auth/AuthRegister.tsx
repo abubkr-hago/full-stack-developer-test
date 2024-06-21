@@ -9,6 +9,7 @@ interface registerType {
   title?: string;
   subtitle?: JSX.Element | JSX.Element[];
   subtext?: JSX.Element | JSX.Element[];
+  state?: any
 }
 
 function AuthRegister({ title, subtitle, subtext, state }: registerType) {

@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 export async function login(prevState: any, formData: FormData) {
   const email = formData.get('email');
   const password = formData.get('password');
-  return Parse.User.logIn(email, password).then(
+  return Parse.User.logIn(email as string, password as string).then(
     user => {
       cookies().set('sessionToken', user.getSessionToken());
       redirect('/');
@@ -33,7 +33,7 @@ export async function signup(prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
   console.log({ data });
   for (const value of it) console.log({ value });
-  return Parse.User.signUp(email, password, { first_name, last_name })
+  return Parse.User.signUp(email as string, password as string, { first_name, last_name })
     .then(user => {
       cookies().set('sessionToken', user.getSessionToken());
       redirect('/');

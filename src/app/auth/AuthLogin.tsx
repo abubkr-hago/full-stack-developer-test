@@ -9,9 +9,10 @@ interface loginType {
   title?: string;
   subtitle?: JSX.Element | JSX.Element[];
   subtext?: JSX.Element | JSX.Element[];
+  state?: any
 }
 
-function AuthLogin({ title, subtitle, subtext }: loginType) {
+function AuthLogin({ title, subtitle, subtext,state }: loginType) {
   const { pending } = useFormStatus();
   return (
     <>
@@ -68,6 +69,9 @@ function AuthLogin({ title, subtitle, subtext }: loginType) {
           </Typography>
         </Stack>
       </Stack>
+      <Typography mb="5px" variant="body1" sx={{ color: theme => theme.palette.error.main }}>
+        {state?.message}
+      </Typography>
       <Box>
         <Button
           color="primary"
