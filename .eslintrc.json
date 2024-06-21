@@ -1,5 +1,10 @@
 {
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
   "env": {
     "node": true,
     "es6": true
@@ -31,5 +36,9 @@
     "no-var": "warn",
     "no-await-in-loop": "warn",
     "@typescript-eslint/no-this-alias": "off"
+  },
+  "ignorePatterns": ["dist", "logs", ".next"],
+  "globals": {
+    "Parse": true
   }
 }
