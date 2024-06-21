@@ -18,8 +18,8 @@ This project implements a comprehensive system with user and admin functionaliti
 
 1. **Account Management:**
 
-   - [ ] Create an account (Register).
-   - [ ] Sign in.
+   - [x] Create an account (Register).
+   - [x] Sign in.
    - [ ] View personal information.
    - [ ] Modify personal information.
    - [ ] Change password.
@@ -32,18 +32,18 @@ This project implements a comprehensive system with user and admin functionaliti
 
 1. **User Management:**
 
-   - [ ] View information of all users.
-   - [ ] Modify user's information.
-   - [ ] Delete a user from the site.
-   - [ ] Promote a user to administrator (admin).
+   - [x] View information of all users.
+   - [x] Modify user's information.
+   - [x] Delete a user from the site.
+   - [x] Promote a user to administrator (admin).
 
 2. **Role Management:**
 
-   - [ ] Create new roles.
-   - [ ] Manage roles in a roles table.
+   - [x] Create new roles.
+   - [x] Manage roles in a roles table.
 
 3. **Product Management:**
-   - [ ] Create a product (product name, price, description).
+   - [x] Create a product (product name, price, description).
 
 ## Project Requirements
 
