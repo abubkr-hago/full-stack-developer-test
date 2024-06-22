@@ -5,14 +5,7 @@ import { Box, Button, Typography } from '@mui/material';
 import CustomTextField from '@/app/dashboard/(DashboardLayout)/components/forms/theme-elements/CustomTextField';
 import { Stack } from '@mui/system';
 
-interface registerType {
-  title?: string;
-  subtitle?: JSX.Element | JSX.Element[];
-  subtext?: JSX.Element | JSX.Element[];
-  state?: any
-}
-
-function AuthRegister({ title, subtitle, subtext, state }: registerType) {
+function AuthRegister({ title, subtitle, subtext, state }) {
   const { pending } = useFormStatus();
   return (
     <>
@@ -74,7 +67,7 @@ function AuthRegister({ title, subtitle, subtext, state }: registerType) {
           <CustomTextField id="password" name="password" variant="outlined" fullWidth />
         </Stack>
         <Typography mb="5px" variant="body1" sx={{ color: theme => theme.palette.error.main }}>
-          {state?.message}
+          {state?.error?.message}
         </Typography>
         <Button
           color="primary"

@@ -20,12 +20,12 @@ This project implements a comprehensive system with user and admin functionaliti
 
    - [x] Create an account (Register).
    - [x] Sign in.
-   - [ ] View personal information.
-   - [ ] Modify personal information.
-   - [ ] Change password.
+   - [x] View personal information.
+   - [x] Modify personal information.
+   - [x] Change password.
 
 2. **Shopping:**
-   - [ ] Add a product to the cart.
+   - [x] Add a product to the cart.
    - [ ] Make a purchase using the Stripe payment gateway (developer test mode).
 
 ### Admin Functionalities

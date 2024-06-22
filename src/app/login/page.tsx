@@ -1,20 +1,26 @@
-'use client';
+'use server';
 import Link from 'next/link';
 import { Box, Card, Grid, Stack, Typography } from '@mui/material';
-// components
 import PageContainer from '@/app/dashboard/(DashboardLayout)/components/container/PageContainer';
 import Logo from '@/app/dashboard/(DashboardLayout)/layout/shared/logo/Logo';
 import AuthLogin from '../auth/AuthLogin';
-import { useFormState } from 'react-dom';
-import { login } from '@/app/lib/actions';
+import { getCsrfToken } from 'next-auth/react';
+import React from 'react';
+import { cookies } from 'next/headers';
+import { auth } from '../../config/auth';
+import { redirect } from 'next/navigation';
 
-const initialState = {
-  user: null,
-  message: '',
-};
-
-function Login2() {
-  const [state, formAction] = useFormState(login, initialState);
+export default async function Page({ searchParams }) {
+  const session = await auth();
+  if (session) return redirect('/profile');
+  const { error } = searchParams || {};
+  const csrfToken = await getCsrfToken({
+    req: {
+      headers: {
+        cookie: cookies().toString(),
+      },
+    },
+  });
   return (
     <PageContainer title="Login" description="this is Login page">
       <Box
@@ -47,9 +53,14 @@ function Login2() {
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Logo />
               </Box>
-              <form action={formAction}>
+              <form
+                // action={formAction}
+                method="post"
+                action="/api/auth/callback/credentials"
+              >
+                <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
                 <AuthLogin
-                  state={state}
+                  state={{ message: error }}
                   subtext={
                     <Typography variant="subtitle1" textAlign="center" color="textSecondary" mb={1}>
                       Your Preferred Store
@@ -82,4 +93,3 @@ function Login2() {
     </PageContainer>
   );
 }
-export default Login2;

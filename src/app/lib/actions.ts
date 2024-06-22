@@ -1,44 +1,52 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-
-export async function login(prevState: any, formData: FormData) {
-  const email = formData.get('email');
-  const password = formData.get('password');
-  return Parse.User.logIn(email as string, password as string).then(
-    user => {
-      cookies().set('sessionToken', user.getSessionToken());
-      redirect('/');
-    },
-    e => ({ code: e.code, message: e.message })
-  );
-}
-
-export async function getSession() {
-  const sessionToken = cookies().get('sessionToken')?.value;
-  if (!sessionToken) return null;
-  return new Parse.Query(Parse.Session)
-    .equalTo('sessionToken', sessionToken)
-    .first({ useMasterKey: true })
-    .then(result => result.getSessionToken());
-}
+import { auth } from '../../config/auth';
 
 export async function signup(prevState: any, formData: FormData) {
-  const email = formData.get('email');
-  const password = formData.get('password');
-  const first_name = formData.get('first_name');
-  const last_name = formData.get('last_name');
-  const it = formData.values();
-  const data = Object.fromEntries(formData.entries());
-  console.log({ data });
-  for (const value of it) console.log({ value });
-  return Parse.User.signUp(email as string, password as string, { first_name, last_name })
-    .then(user => {
-      cookies().set('sessionToken', user.getSessionToken());
-      redirect('/');
-    })
-    .catch(e => {
-      return { code: e.code, message: e.message };
-    });
+  const { email, password, first_name, last_name } = Object.fromEntries(formData.entries());
+  return Parse.User.signUp(email as string, password as string, { email, first_name, last_name })
+    .then(() => redirect('/'))
+    .catch(e => ({ error: { code: e.code, message: e.message } }));
+}
+
+export async function changePassword(prevState: any, formData: FormData) {
+  const authData = await auth();
+  const sessionToken = authData?.sessionToken;
+  const { old_password, new_password } = Object.fromEntries(formData.entries());
+  return Parse.Cloud.run('changePassword', { old_password, new_password }, { sessionToken })
+    .then(o => o.toJSON())
+    .catch(e => ({ error: { code: e.code, message: e.message } }));
+}
+
+export async function updateUser(prevState: any, formData: FormData) {
+  const session = await auth();
+  const sessionToken = session?.sessionToken;
+  if (!sessionToken) return redirect('/login');
+  const { first_name, last_name, email, phone, city, country } = Object.fromEntries(
+    formData.entries()
+  );
+  return new Parse.Query(Parse.User)
+    .equalTo('objectId', session.objectId)
+    .first({ sessionToken })
+    .then(user =>
+      user.save({ first_name, last_name, email, phone, city, country }, { sessionToken })
+    )
+    .then(user => user.toJSON())
+    .catch(e => ({ error: { code: e.code, message: e.message } }));
+}
+
+export async function addToCart(prevState: any, formData: FormData) {
+  const session = await auth();
+  const sessionToken = session?.sessionToken;
+  if (!sessionToken) return redirect('/login');
+  const objectId = formData.get('objectId');
+  const product = await new Parse.Query('Product')
+    .equalTo('objectId', objectId)
+    .first({ sessionToken })
+    .catch(e => ({ code: e.code, message: e.message }));
+  return new Parse.Object('Cart')
+    .save({ product }, { sessionToken })
+    .then(cart => cart.toJSON())
+    .catch(e => ({ error: { code: e.code, message: e.message } }));
 }

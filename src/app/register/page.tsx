@@ -6,6 +6,8 @@ import Logo from '@/app/dashboard/(DashboardLayout)/layout/shared/logo/Logo';
 import AuthRegister from '../auth/AuthRegister';
 import { signup } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
 
 const initialState = {
   user: null,
@@ -13,7 +15,9 @@ const initialState = {
 };
 
 function Register2() {
+  const session = useSession();
   const [state, formAction] = useFormState(signup, initialState);
+  if (session?.data) return redirect('/profile');
   return (
     <PageContainer title="Register" description="this is Register page">
       <Box

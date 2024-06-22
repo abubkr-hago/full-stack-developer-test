@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Box, Button, FormGroup, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
@@ -9,10 +10,10 @@ interface loginType {
   title?: string;
   subtitle?: JSX.Element | JSX.Element[];
   subtext?: JSX.Element | JSX.Element[];
-  state?: any
+  state?: any;
 }
 
-function AuthLogin({ title, subtitle, subtext,state }: loginType) {
+function AuthLogin({ title, subtitle, subtext, state }: loginType) {
   const { pending } = useFormStatus();
   return (
     <>
