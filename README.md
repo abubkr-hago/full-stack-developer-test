@@ -26,7 +26,7 @@ This project implements a comprehensive system with user and admin functionaliti
 
 2. **Shopping:**
    - [x] Add a product to the cart.
-   - [ ] Make a purchase using the Stripe payment gateway (developer test mode).
+   - [x] Make a purchase using the Stripe payment gateway (developer test mode).
 
 ### Admin Functionalities
 
@@ -80,7 +80,7 @@ This project implements a comprehensive system with user and admin functionaliti
 
 The project has been deployed to Vercel. You can access it using the following link:
 
-- [ ] [Vercel link](/#)
+- [x] [Fly.io link](https://full-stack-developer-test2.fly.dev)
 
 ## License
 

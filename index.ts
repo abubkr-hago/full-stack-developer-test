@@ -124,6 +124,28 @@ const dashboard = new ParseDashboard({
 
 export const app = express();
 
+if (production) app.set('trust proxy', true);
+
+app.use(async function (req, res, next) {
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+
+  const requestIsLocal =
+    req.connection.remoteAddress === '127.0.0.1' ||
+    req.connection.remoteAddress === '::ffff:127.0.0.1' ||
+    req.connection.remoteAddress === '::1';
+
+  if (req.secure || requestIsLocal) {
+    return next();
+  } else {
+    // Only redirect GET methods
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      return res.redirect(301, 'https://' + host + req.originalUrl);
+    } else {
+      return res.status(403).json({ error: 'Please use secure HTTPS when submitting data.' });
+    }
+  }
+});
+
 // when using middleware `hostname` and `port` must be provided below
 const nextApp = next({ dev, port });
 const handle = nextApp.getRequestHandler();
