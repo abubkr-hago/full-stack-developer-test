@@ -12,7 +12,7 @@ import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import ToggleColorMode from './ToggleColorMode';
 import { signOut, useSession } from 'next-auth/react';
-import { Login, Logout, Person } from '@mui/icons-material';
+import { Login, Logout, Person, ShoppingCart } from '@mui/icons-material';
 import { usePathname } from 'next/navigation';
 
 const logoStyle = {
@@ -148,6 +148,14 @@ function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               {!session && (
                 <IconButton>
                   <Login color="primary" onClick={() => window.location.replace('/login')} />
+                </IconButton>
+              )}
+              {!!session && pathname !== '/profile' && (
+                <IconButton>
+                  <ShoppingCart
+                    color="primary"
+                    onClick={() => window.location.replace('/checkout')}
+                  />
                 </IconButton>
               )}
               {!!session && pathname !== '/profile' && (

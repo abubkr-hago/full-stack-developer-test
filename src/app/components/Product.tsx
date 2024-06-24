@@ -10,12 +10,12 @@ function Product({ objectId, title, price, photo, rating, state }) {
   const { pending } = useFormStatus();
   return (
     <BlankCard>
-      <UnstyledSnackbarIntroduction title={`Adding ${title} to cart...`} open={pending} />
-      {!pending && (
+      {pending && <UnstyledSnackbarIntroduction title={`Adding ${title} to cart...`} open />}
+      {state?.error?.message && (
         <UnstyledSnackbarIntroduction
           description={state?.error?.message}
           autoHideDuration={5000}
-          open={!!state?.error?.message}
+          open
         />
       )}
       <input hidden name="objectId" value={objectId} />

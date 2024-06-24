@@ -64,7 +64,13 @@ function AuthRegister({ title, subtitle, subtext, state }) {
           >
             Password
           </Typography>
-          <CustomTextField id="password" name="password" variant="outlined" fullWidth />
+          <CustomTextField
+            id="password"
+            type="password"
+            name="password"
+            variant="outlined"
+            fullWidth
+          />
         </Stack>
         <Typography mb="5px" variant="body1" sx={{ color: theme => theme.palette.error.main }}>
           {state?.error?.message}
