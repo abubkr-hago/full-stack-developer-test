@@ -81,14 +81,16 @@ export const config = {
     await collection.findOneAndUpdate(
       { _id: 'Product' },
       {
-        $set: { _id: 'Product' },
-        objectId: 'string',
-        updatedAt: 'date',
-        createdAt: 'date',
-        _metadata: {
-          indexes: {
-            _id_: {
-              _id: 1,
+        $set: {
+          _id: 'Product',
+          objectId: 'string',
+          updatedAt: 'date',
+          createdAt: 'date',
+          _metadata: {
+            indexes: {
+              _id_: {
+                _id: 1,
+              },
             },
           },
         },
@@ -98,14 +100,16 @@ export const config = {
     await collection.findOneAndUpdate(
       { _id: 'Cart' },
       {
-        $set: { _id: 'Cart' },
-        objectId: 'string',
-        updatedAt: 'date',
-        createdAt: 'date',
-        _metadata: {
-          indexes: {
-            _id_: {
-              _id: 1,
+        $set: {
+          _id: 'Cart',
+          objectId: 'string',
+          updatedAt: 'date',
+          createdAt: 'date',
+          _metadata: {
+            indexes: {
+              _id_: {
+                _id: 1,
+              },
             },
           },
         },
