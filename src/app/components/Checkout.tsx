@@ -30,7 +30,9 @@ import Link from 'next/link';
 import { Elements, ElementsConsumer, PaymentElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
-const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+const stripe = loadStripe(
+  'pk_test_51PDrRn06N7vpTor2c1hHQwYHOYp5NCimUuJJ5ZKPnCj30EzJerb5d5Y7Twl55xJk6CxkiyZi4Uh89CshBy9P76MQ00k4GLjCbV'
+);
 
 const steps = ['Shipping address', 'Payment details', 'Congratulations!'];
 
