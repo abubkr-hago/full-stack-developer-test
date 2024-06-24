@@ -209,7 +209,7 @@ function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                       color="primary"
                       variant="contained"
                       component="a"
-                      href="/material-ui/getting-started/templates/sign-up/"
+                      href="/register"
                       target="_blank"
                       sx={{ width: '100%' }}
                     >
@@ -221,7 +221,7 @@ function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                       color="primary"
                       variant="outlined"
                       component="a"
-                      href="/material-ui/getting-started/templates/sign-in/"
+                      href="/login"
                       target="_blank"
                       sx={{ width: '100%' }}
                     >
