@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -29,6 +30,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Elements, ElementsConsumer, PaymentElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { useFormStatus } from 'react-dom';
 
 const stripe = loadStripe(
   'pk_test_51PDrRn06N7vpTor2c1hHQwYHOYp5NCimUuJJ5ZKPnCj30EzJerb5d5Y7Twl55xJk6CxkiyZi4Uh89CshBy9P76MQ00k4GLjCbV'
@@ -53,6 +55,8 @@ export default function Checkout({ transaction, products, clientSecret }) {
   const checkoutTheme = createTheme(getCheckoutTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
   const [activeStep, setActiveStep] = React.useState(redirect_status ? 2 : 0);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const { pending } = useFormStatus();
 
   const toggleColorMode = () => {
     setMode(prev => (prev === 'dark' ? 'light' : 'dark'));
@@ -306,13 +310,14 @@ export default function Checkout({ transaction, products, clientSecret }) {
                       <form
                         onSubmit={async event => {
                           event.preventDefault();
-                          await stripe.confirmPayment({
+                          const { error } = await stripe.confirmPayment({
                             elements,
                             confirmParams: {
                               // Make sure to change this to your payment completion page
                               return_url: window.location.toString(),
                             },
                           });
+                          setErrorMessage(error?.message);
                         }}
                       >
                         <Grid
@@ -322,6 +327,13 @@ export default function Checkout({ transaction, products, clientSecret }) {
                         >
                           <PaymentElement id="payment-element" options={{ layout: 'tabs' }} />
                         </Grid>
+                        <Typography
+                          mb="5px"
+                          variant="body1"
+                          sx={{ color: theme => theme.palette.error.main }}
+                        >
+                          {errorMessage}
+                        </Typography>
                         <Box
                           sx={{
                             display: 'flex',
@@ -349,6 +361,7 @@ export default function Checkout({ transaction, products, clientSecret }) {
                             variant="contained"
                             endIcon={<ChevronRightRoundedIcon />}
                             type="submit"
+                            disabled={!stripe || pending}
                             sx={{
                               width: { xs: '100%', sm: 'fit-content' },
                             }}
