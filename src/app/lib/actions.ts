@@ -6,7 +6,7 @@ import { auth } from '../../config/auth';
 export async function signup(prevState: any, formData: FormData) {
   const { email, password, first_name, last_name } = Object.fromEntries(formData.entries());
   return Parse.User.signUp(email as string, password as string, { email, first_name, last_name })
-    .then(() => redirect('/'))
+    .then(() => ({ success: true, email }))
     .catch(e => ({ error: { code: e.code, message: e.message } }));
 }
 

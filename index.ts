@@ -78,6 +78,40 @@ export const config = {
     await import('./cloud/main.js');
     const collection: Collection = await adapter.database.collection('_SCHEMA');
     await collection.findOneAndUpdate({ _id: 'Transaction' }, { $set: schema }, { upsert: true });
+    await collection.findOneAndUpdate(
+      { _id: 'Product' },
+      {
+        $set: { _id: 'Product' },
+        objectId: 'string',
+        updatedAt: 'date',
+        createdAt: 'date',
+        _metadata: {
+          indexes: {
+            _id_: {
+              _id: 1,
+            },
+          },
+        },
+      },
+      { upsert: true }
+    );
+    await collection.findOneAndUpdate(
+      { _id: 'Cart' },
+      {
+        $set: { _id: 'Cart' },
+        objectId: 'string',
+        updatedAt: 'date',
+        createdAt: 'date',
+        _metadata: {
+          indexes: {
+            _id_: {
+              _id: 1,
+            },
+          },
+        },
+      },
+      { upsert: true }
+    );
   },
   appId: process.env.APP_ID || 'mobile',
   masterKey: process.env.MASTER_KEY || crypto.randomUUID().toString(),

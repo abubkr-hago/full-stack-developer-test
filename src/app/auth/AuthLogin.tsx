@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import CustomTextField from '@/app/dashboard/(DashboardLayout)/components/forms/theme-elements/CustomTextField';
 import { useFormStatus } from 'react-dom';
+import { useSearchParams } from 'next/navigation';
 
 interface loginType {
   title?: string;
@@ -15,6 +16,8 @@ interface loginType {
 
 function AuthLogin({ title, subtitle, subtext, state }: loginType) {
   const { pending } = useFormStatus();
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email');
   return (
     <>
       {title ? (
@@ -36,7 +39,13 @@ function AuthLogin({ title, subtitle, subtext, state }: loginType) {
           >
             Email
           </Typography>
-          <CustomTextField id="email" name="email" variant="outlined" fullWidth />
+          <CustomTextField
+            id="email"
+            defaultValue={email}
+            name="email"
+            variant="outlined"
+            fullWidth
+          />
         </Box>
         <Box mt="25px">
           <Typography

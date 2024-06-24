@@ -11,13 +11,16 @@ import { redirect } from 'next/navigation';
 
 const initialState = {
   user: null,
-  message: '',
+  error: { code: 0, message: '' },
 };
 
 function Register2() {
   const session = useSession();
   const [state, formAction] = useFormState(signup, initialState);
   if (session?.data) return redirect('/profile');
+  if (state.success) {
+    return redirect(`/login?email=${state.email}`);
+  }
   return (
     <PageContainer title="Register" description="this is Register page">
       <Box
