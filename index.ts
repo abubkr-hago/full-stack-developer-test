@@ -85,6 +85,7 @@ export const config = {
   publicServerURL: process.env.PUBLIC_SERVER_URL || `http://${currentIp}:${port}/parse`,
   allowClientClassCreation: false,
   allowExpiredAuthDataToken: false,
+  masterKeyIps: ['0.0.0.0/0', '::/0'],
 };
 
 const users = !dev
