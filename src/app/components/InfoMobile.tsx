@@ -14,7 +14,7 @@ interface InfoProps {
   totalPrice: string;
 }
 
-export default function InfoMobile({ totalPrice }: InfoProps) {
+export default function InfoMobile({ totalPrice, products }: InfoProps) {
   const [open, setOpen] = React.useState(false);
 
   const toggleDrawer = (newOpen: boolean) => () => {
@@ -26,7 +26,7 @@ export default function InfoMobile({ totalPrice }: InfoProps) {
       <IconButton onClick={toggleDrawer(false)} sx={{ position: 'absolute', right: 8, top: 8 }}>
         <CloseIcon />
       </IconButton>
-      <Info totalPrice={totalPrice} />
+      <Info totalPrice={totalPrice} products={products} />
     </Box>
   );
 

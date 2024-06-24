@@ -14,6 +14,9 @@ import next from 'next';
 import http from 'http';
 import os from 'os';
 import { parse } from 'url';
+import { AppCache } from 'parse-server/lib/cache.js';
+import { Collection } from 'mongodb';
+import Stripe from 'stripe';
 
 const hostname = os.hostname();
 const currentIp = ip.address();
@@ -24,13 +27,57 @@ if (dev) dotenv.config({ path: './.env', debug: true });
 
 const port = parseInt(process.env.PORT) || 3000;
 
+const schema: any = {
+  _id: 'Transaction',
+  objectId: 'string',
+  updatedAt: 'date',
+  createdAt: 'date',
+  _metadata: {
+    indexes: {
+      _id_: {
+        _id: 1,
+      },
+    },
+    fields_options: {
+      id: {
+        required: false,
+      },
+      products: {
+        required: false,
+      },
+    },
+  },
+  amount_details: 'object',
+  object: 'string',
+  amount: 'number',
+  amount_capturable: 'number',
+  capture_method: 'string',
+  confirmation_method: 'string',
+  created: 'number',
+  client_secret: 'string',
+  amount_received: 'number',
+  metadata: 'object',
+  status: 'string',
+  payment_method_options: 'object',
+  payment_method_types: 'array',
+  automatic_payment_methods: 'object',
+  currency: 'string',
+  livemode: 'boolean',
+  id: 'string',
+  products: 'array',
+};
+
 export const config = {
   appName: 'Store',
   databaseURI:
     process.env.MONGODB_URI ||
     `mongodb://${hostname}:27017,${hostname}:27018,${hostname}:27019/store?replicaSet=rs`,
   cloud: async () => {
+    const app = AppCache.get(Parse.applicationId);
+    const adapter = app.databaseController.adapter;
     await import('./cloud/main.js');
+    const collection: Collection = await adapter.database.collection('_SCHEMA');
+    await collection.findOneAndUpdate({ _id: 'Transaction' }, { $set: schema }, { upsert: true });
   },
   appId: process.env.APP_ID || 'mobile',
   masterKey: process.env.MASTER_KEY || crypto.randomUUID().toString(),
@@ -85,6 +132,25 @@ const handle = nextApp.getRequestHandler();
 const server = new ParseServer(config);
 await Promise.all([server.start(), nextApp.prepare()]);
 app.use('/parse', server.app);
+
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const stripe = new Stripe(process.env.STRIPE_SECRET);
+app.use('/stripe-payment', express.raw({ type: 'application/json' }), async (req, res) => {
+  await Promise.resolve()
+    .then(async () => {
+      const sig = req.headers['stripe-signature'];
+      const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      const object: any = event?.data?.object;
+      const transaction = await new Parse.Query('Transaction')
+        .equalTo('id', object.id)
+        .first({ useMasterKey: true });
+      await transaction.save(object, { useMasterKey: true }); // this will update the transaction data
+      res.status(200).json({ success: true });
+    })
+    .catch(e => {
+      res.status(400).json({ code: e.code, message: e.message });
+    });
+});
 app.use('/parse-dashboard', dashboard);
 app.all('*', (req, res) => handle(req, res, parse(req.url, true)));
 

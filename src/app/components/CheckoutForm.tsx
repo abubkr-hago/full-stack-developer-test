@@ -1,12 +1,9 @@
-import { useElements, useStripe } from '@stripe/react-stripe-js';
+import { useStripe } from '@stripe/react-stripe-js';
 import { useSearchParams } from 'next/navigation';
 
 export default function CheckoutForm() {
   const searchParams = useSearchParams();
   const stripe = useStripe();
-  const elements = useElements();
-  const [state, setState] = React.useState({});
-  const [isLoading, setIsLoading] = React.useState(false);
   React.useEffect(() => {
     if (!stripe) {
       return;

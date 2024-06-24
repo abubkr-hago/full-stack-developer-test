@@ -21,6 +21,7 @@ export default function Page() {
   const [updateState, updateUserAction] = useFormState(updateUser, user);
   const [passwordState, changePasswordAction] = useFormState(changePassword, user);
   const ref = useRef<HTMLFormElement>();
+
   React.useEffect(() => {
     if (ref.current && !passwordState?.error) {
       ref.current.reset();

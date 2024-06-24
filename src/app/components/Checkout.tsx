@@ -24,11 +24,15 @@ import AddressForm from './AddressForm';
 import getCheckoutTheme from './getCheckoutTheme';
 import Info from './Info';
 import InfoMobile from './InfoMobile';
-import PaymentForm from './PaymentForm';
-import Review from './Review';
 import ToggleColorMode from './ToggleColorMode';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Elements, ElementsConsumer, PaymentElement } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
-const steps = ['Shipping address', 'Payment details', 'Review your order'];
+const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
+const steps = ['Shipping address', 'Payment details', 'Congratulations!'];
 
 const logoStyle = {
   width: '140px',
@@ -37,25 +41,16 @@ const logoStyle = {
   marginRight: '-8px',
 };
 
-function getStepContent(step: number) {
-  switch (step) {
-    case 0:
-      return <AddressForm />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    default:
-      throw new Error('Unknown step');
-  }
-}
-
-export default function Checkout() {
+export default function Checkout({ transaction, products, clientSecret }) {
+  const searchParams = useSearchParams();
+  const id = searchParams?.get('id');
+  const payment_intent = searchParams.get('payment_intent');
+  const redirect_status = searchParams.get('redirect_status');
   const [mode, setMode] = React.useState<PaletteMode>('light');
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const checkoutTheme = createTheme(getCheckoutTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = React.useState(redirect_status ? 2 : 0);
 
   const toggleColorMode = () => {
     setMode(prev => (prev === 'dark' ? 'light' : 'dark'));
@@ -122,7 +117,7 @@ export default function Checkout() {
               maxWidth: 500,
             }}
           >
-            <Info totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} />
+            <Info products={products} totalPrice={`AED ${transaction.amount}`} />
           </Box>
         </Grid>
         <Grid
@@ -228,9 +223,9 @@ export default function Checkout() {
                 <Typography variant="subtitle2" gutterBottom>
                   Selected products
                 </Typography>
-                <Typography variant="body1">{activeStep >= 2 ? '$144.97' : '$134.98'}</Typography>
+                <Typography variant="body1">{`AED ${transaction.amount}`}</Typography>
               </div>
-              <InfoMobile totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} />
+              <InfoMobile products={products} totalPrice={`AED ${transaction.amount}`} />
             </CardContent>
           </Card>
           <Box
@@ -265,79 +260,140 @@ export default function Checkout() {
                 </Step>
               ))}
             </Stepper>
-            {activeStep === steps.length ? (
-              <Stack spacing={2} useFlexGap>
-                <Typography variant="h1">📦</Typography>
-                <Typography variant="h5">Thank you for your order!</Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Your order number is
-                  <strong>&nbsp;#140396</strong>. We have emailed your order confirmation and will
-                  update you once its shipped.
-                </Typography>
-                <Button
-                  variant="contained"
-                  sx={{
-                    alignSelf: 'start',
-                    width: { xs: '100%', sm: 'auto' },
-                  }}
-                >
-                  Go to my orders
-                </Button>
-              </Stack>
-            ) : (
-              <React.Fragment>
-                {getStepContent(activeStep)}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column-reverse', sm: 'row' },
-                    justifyContent: activeStep !== 0 ? 'space-between' : 'flex-end',
-                    alignItems: 'end',
-                    flexGrow: 1,
-                    gap: 1,
-                    pb: { xs: 12, sm: 0 },
-                    mt: { xs: 2, sm: 0 },
-                    mb: '60px',
-                  }}
-                >
-                  {activeStep !== 0 && (
-                    <Button
-                      startIcon={<ChevronLeftRoundedIcon />}
-                      onClick={handleBack}
-                      variant="text"
-                      sx={{
-                        display: { xs: 'none', sm: 'flex' },
-                      }}
-                    >
-                      Previous
-                    </Button>
-                  )}
-                  {activeStep !== 0 && (
-                    <Button
-                      startIcon={<ChevronLeftRoundedIcon />}
-                      onClick={handleBack}
-                      variant="outlined"
-                      fullWidth
-                      sx={{
-                        display: { xs: 'flex', sm: 'none' },
-                      }}
-                    >
-                      Previous
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    endIcon={<ChevronRightRoundedIcon />}
-                    onClick={handleNext}
+            <React.Fragment>
+              {activeStep === 0 ? (
+                <>
+                  <AddressForm />
+                  <Box
                     sx={{
-                      width: { xs: '100%', sm: 'fit-content' },
+                      display: 'flex',
+                      flexDirection: { xs: 'column-reverse', sm: 'row' },
+                      justifyContent: activeStep !== 0 ? 'space-between' : 'flex-end',
+                      alignItems: 'end',
+                      flexGrow: 1,
+                      gap: 1,
+                      pb: { xs: 12, sm: 0 },
+                      mt: { xs: 2, sm: 0 },
+                      mb: '60px',
                     }}
                   >
-                    {activeStep === steps.length - 1 ? 'Place order' : 'Next'}
+                    <Button
+                      variant="contained"
+                      endIcon={<ChevronRightRoundedIcon />}
+                      onClick={handleNext}
+                      sx={{
+                        width: { xs: '100%', sm: 'fit-content' },
+                      }}
+                    >
+                      Next
+                    </Button>
+                  </Box>
+                </>
+              ) : activeStep === 1 ? (
+                <Elements
+                  stripe={stripe}
+                  options={{
+                    appearance: {
+                      theme: 'stripe',
+                    },
+                    clientSecret,
+                  }}
+                >
+                  <ElementsConsumer>
+                    {({ stripe, elements }) => (
+                      <form
+                        onSubmit={async event => {
+                          event.preventDefault();
+                          await stripe.confirmPayment({
+                            elements,
+                            confirmParams: {
+                              // Make sure to change this to your payment completion page
+                              return_url: window.location.toString(),
+                            },
+                          });
+                        }}
+                      >
+                        <Grid
+                          sx={{
+                            mb: '60px',
+                          }}
+                        >
+                          <PaymentElement id="payment-element" options={{ layout: 'tabs' }} />
+                        </Grid>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column-reverse', sm: 'row' },
+                            justifyContent: activeStep !== 0 ? 'space-between' : 'flex-end',
+                            alignItems: 'end',
+                            flexGrow: 1,
+                            gap: 1,
+                            pb: { xs: 12, sm: 0 },
+                            mt: { xs: 2, sm: 0 },
+                            mb: '60px',
+                          }}
+                        >
+                          <Button
+                            startIcon={<ChevronLeftRoundedIcon />}
+                            onClick={handleBack}
+                            variant="text"
+                            sx={{
+                              display: { xs: 'none', sm: 'flex' },
+                            }}
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            variant="contained"
+                            endIcon={<ChevronRightRoundedIcon />}
+                            type="submit"
+                            sx={{
+                              width: { xs: '100%', sm: 'fit-content' },
+                            }}
+                          >
+                            Pay
+                          </Button>
+                        </Box>
+                      </form>
+                    )}
+                  </ElementsConsumer>
+                </Elements>
+              ) : (
+                <Stack spacing={2} useFlexGap>
+                  <Typography variant="h1">📦</Typography>
+                  <Typography variant="h5">
+                    {redirect_status === 'succeeded'
+                      ? 'Thank you for your order!'
+                      : 'Payment failure!'}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    {redirect_status === 'succeeded' ? (
+                      <>
+                        Your order number is
+                        <strong>&nbsp;{id}</strong>. We have emailed your order confirmation and
+                        will update you once its shipped.
+                      </>
+                    ) : (
+                      <>
+                        Your payment
+                        <strong>&nbsp;{payment_intent}</strong> Failed, please try again
+                      </>
+                    )}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      alignSelf: 'start',
+                      width: { xs: '100%', sm: 'auto' },
+                    }}
+                    component={Link}
+                    href="/"
+                  >
+                    Go to my orders
                   </Button>
-                </Box>
-              </React.Fragment>
-            )}
+                </Stack>
+              )}
+            </React.Fragment>
           </Box>
         </Grid>
       </Grid>
